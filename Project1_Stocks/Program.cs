@@ -16,7 +16,7 @@ namespace Project1_Stocks
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Form_Input());
         }
     }
 }

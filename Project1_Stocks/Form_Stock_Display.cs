@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace Project1_Stocks
 {
-    public partial class Form1 : Form
+    public partial class Form_Stock_Display : Form
     {
-        public Form1()
+        public Form_Stock_Display()
         {
             InitializeComponent();
         }
