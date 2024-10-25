@@ -46,8 +46,10 @@
             this.chart_stocks.Location = new System.Drawing.Point(0, 0);
             this.chart_stocks.Name = "chart_stocks";
             series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Candlestick;
             series1.Legend = "Legend1";
             series1.Name = "Series1";
+            series1.YValuesPerPoint = 4;
             this.chart_stocks.Series.Add(series1);
             this.chart_stocks.Size = new System.Drawing.Size(1138, 322);
             this.chart_stocks.TabIndex = 0;
@@ -60,7 +62,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(240, 150);
+            this.dataGridView1.Size = new System.Drawing.Size(1138, 291);
             this.dataGridView1.TabIndex = 1;
             // 
             // Form_Stock_Display

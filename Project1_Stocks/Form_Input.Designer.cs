@@ -33,6 +33,7 @@
             this.Label_startDate = new System.Windows.Forms.Label();
             this.Label_endDate = new System.Windows.Forms.Label();
             this.button_loadStock = new System.Windows.Forms.Button();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // dateTimePicker_endDate
@@ -82,6 +83,10 @@
             this.button_loadStock.Text = "Load Stock";
             this.button_loadStock.UseVisualStyleBackColor = true;
             // 
+            // openFileDialog
+            // 
+            this.openFileDialog.FileName = "openFileDialog";
+            // 
             // Form_Input
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -106,6 +111,7 @@
         private System.Windows.Forms.Label Label_startDate;
         private System.Windows.Forms.Label Label_endDate;
         private System.Windows.Forms.Button button_loadStock;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
     }
 }
 
