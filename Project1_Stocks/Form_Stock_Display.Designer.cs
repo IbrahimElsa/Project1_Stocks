@@ -28,9 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.chart_stocks = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label_stockName = new System.Windows.Forms.Label();
@@ -42,20 +40,12 @@
             // 
             this.chart_stocks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea2.Name = "ChartArea1";
-            this.chart_stocks.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.chart_stocks.Legends.Add(legend2);
-            this.chart_stocks.Location = new System.Drawing.Point(0, 87);
-            this.chart_stocks.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            chartArea1.Name = "ChartArea1";
+            this.chart_stocks.ChartAreas.Add(chartArea1);
+            this.chart_stocks.Location = new System.Drawing.Point(-21, 71);
+            this.chart_stocks.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.chart_stocks.Name = "chart_stocks";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Candlestick;
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            series2.YValuesPerPoint = 4;
-            this.chart_stocks.Series.Add(series2);
-            this.chart_stocks.Size = new System.Drawing.Size(1690, 581);
+            this.chart_stocks.Size = new System.Drawing.Size(1289, 472);
             this.chart_stocks.TabIndex = 0;
             this.chart_stocks.Text = "chart1";
             // 
@@ -63,35 +53,34 @@
             // 
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 672);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 546);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.Size = new System.Drawing.Size(1690, 297);
+            this.dataGridView1.Size = new System.Drawing.Size(1268, 241);
             this.dataGridView1.TabIndex = 1;
             // 
             // label_stockName
             // 
             this.label_stockName.AutoSize = true;
             this.label_stockName.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_stockName.Location = new System.Drawing.Point(672, 20);
-            this.label_stockName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_stockName.Location = new System.Drawing.Point(534, 16);
             this.label_stockName.Name = "label_stockName";
-            this.label_stockName.Size = new System.Drawing.Size(270, 52);
+            this.label_stockName.Size = new System.Drawing.Size(217, 39);
             this.label_stockName.TabIndex = 2;
             this.label_stockName.Text = "Stock Name";
             // 
             // Form_Stock_Display
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1692, 970);
+            this.ClientSize = new System.Drawing.Size(1269, 788);
             this.Controls.Add(this.label_stockName);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.chart_stocks);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form_Stock_Display";
             this.Text = "Stock Display";
             ((System.ComponentModel.ISupportInitialize)(this.chart_stocks)).EndInit();
