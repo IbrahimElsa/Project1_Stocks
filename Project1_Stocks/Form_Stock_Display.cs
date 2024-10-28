@@ -23,59 +23,67 @@ namespace Project1_Stocks
             chart_stocks.Series.Clear();
             chart_stocks.ChartAreas.Clear();
 
-            // Configure chart area
-            var chartArea = new ChartArea("ChartArea1");
-            chartArea.AxisX.MajorGrid.Enabled = false;
-            chartArea.AxisY.MajorGrid.Enabled = true;
-            chartArea.AxisX.LabelStyle.Format = "MMM dd";
+            // Configure main chart area for candlesticks
+            var chartAreaCandlestick = new ChartArea("ChartAreaCandlestick");
+            chartAreaCandlestick.AxisX.MajorGrid.Enabled = false;
+            chartAreaCandlestick.AxisY.MajorGrid.Enabled = true;
+            chartAreaCandlestick.AxisX.LabelStyle.Format = "MMM dd";
 
-            // Set background colors for better visibility
-            chartArea.BackColor = Color.White;
-            chartArea.BorderColor = Color.LightGray;
-            chartArea.BorderWidth = 1;
+            chartAreaCandlestick.BackColor = Color.White;
+            chartAreaCandlestick.BorderColor = Color.LightGray;
+            chartAreaCandlestick.BorderWidth = 1;
 
-            // Configure grid lines for better readability
-            chartArea.AxisX.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
-            chartArea.AxisY.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
+            chartAreaCandlestick.AxisX.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
+            chartAreaCandlestick.AxisY.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
 
-            // Adjust Y-axis range for candlesticks
-            chartArea.AxisY.Minimum = 180;  // Set minimum value based on data
-            chartArea.AxisY.Maximum = 250;  // Set maximum value based on data
+            chartAreaCandlestick.AxisY.Minimum = 180;  // Adjust based on data
+            chartAreaCandlestick.AxisY.Maximum = 250;  // Adjust based on data
 
-            chart_stocks.ChartAreas.Add(chartArea);
+            chartAreaCandlestick.Position = new ElementPosition(0, 0, 100, 70); // 70% height for candlestick chart
+            chart_stocks.ChartAreas.Add(chartAreaCandlestick);
+
+            // Configure second chart area for volume
+            var chartAreaVolume = new ChartArea("ChartAreaVolume");
+            chartAreaVolume.AxisX.MajorGrid.Enabled = false;
+            chartAreaVolume.AxisY.MajorGrid.Enabled = false;
+            chartAreaVolume.AxisX.LabelStyle.Enabled = false;
+
+            chartAreaVolume.BackColor = Color.WhiteSmoke;
+            chartAreaVolume.Position = new ElementPosition(0, 70, 100, 30); // 30% height for volume chart
+            chartAreaVolume.AlignWithChartArea = "ChartAreaCandlestick"; // Aligns with main chart area for X-axis
+
+            chart_stocks.ChartAreas.Add(chartAreaVolume);
 
             // Configure candlestick series
             var candlestickSeries = new Series("Candlestick");
             candlestickSeries.ChartType = SeriesChartType.Candlestick;
             candlestickSeries.XValueType = ChartValueType.DateTime;
-            candlestickSeries.YValuesPerPoint = 4;  // High, Low, Open, Close
+            candlestickSeries.YValuesPerPoint = 4;
 
-            // Enhanced candlestick appearance
-            candlestickSeries["PriceUpColor"] = "LimeGreen";   // Body color when price is up
-            candlestickSeries["PriceDownColor"] = "Red";       // Body color when price is down
-            candlestickSeries["PointWidth"] = "1.0";           // Increased width to remove gaps
-            candlestickSeries["OpenCloseStyle"] = "Triangle";  // Candlestick style
-            candlestickSeries["ShowOpenClose"] = "Both";       // Show both open and close
-
-            // Disable any automatic spacing between points
+            candlestickSeries["PriceUpColor"] = "LimeGreen";
+            candlestickSeries["PriceDownColor"] = "Red";
+            candlestickSeries["PointWidth"] = "1.0";
+            candlestickSeries["OpenCloseStyle"] = "Triangle";
+            candlestickSeries["ShowOpenClose"] = "Both";
             candlestickSeries["EmptyPointValue"] = "Zero";
-            candlestickSeries["MaxPixelPointWidth"] = "15";    // Limit maximum width of candlesticks
+            candlestickSeries["MaxPixelPointWidth"] = "60";
 
+            candlestickSeries.ChartArea = "ChartAreaCandlestick";
             chart_stocks.Series.Add(candlestickSeries);
 
-            // Configure volume series
+            // Configure volume series to use the new volume chart area
             var volumeSeries = new Series("Volume");
             volumeSeries.ChartType = SeriesChartType.Column;
             volumeSeries.XValueType = ChartValueType.DateTime;
-            volumeSeries.YAxisType = AxisType.Secondary;
+            volumeSeries.YAxisType = AxisType.Primary;
+            volumeSeries.Color = Color.LimeGreen; // Semi-transparent blue
+            volumeSeries["PointWidth"] = "0.8";
+            volumeSeries["EmptyPointValue"] = "Zero";
 
-            // Set volume color to blue and adjust width to match candlesticks
-            volumeSeries.Color = Color.FromArgb(128, 0, 0, 255);  // Semi-transparent blue
-            volumeSeries["PointWidth"] = "0.8";                   // Match candlestick spacing
-            volumeSeries["EmptyPointValue"] = "Zero";             // Handle empty points consistently
-
+            volumeSeries.ChartArea = "ChartAreaVolume"; // Assign to the volume chart area
             chart_stocks.Series.Add(volumeSeries);
         }
+
 
         /// <summary>
         /// Loads stock data from a CSV file and displays it in the DataGridView and Chart.
@@ -149,14 +157,13 @@ namespace Project1_Stocks
 
             double maxPrice = double.MinValue;
             double minPrice = double.MaxValue;
-            int index = 0;  // Use an index to plot points consecutively
+            int index = 0;
 
             foreach (DataRow row in stockData.Rows)
             {
                 DateTime date = DateTime.Parse(row["Date"].ToString());
                 double volume = Convert.ToDouble(row["Volume"]);
 
-                // Skip non-trading days with zero volume
                 if (volume == 0) continue;
 
                 double open = Convert.ToDouble(row["Open"]);
@@ -164,50 +171,46 @@ namespace Project1_Stocks
                 double low = Convert.ToDouble(row["Low"]);
                 double close = Convert.ToDouble(row["Close"]);
 
-                // Update max and min prices based on the data
                 if (high > maxPrice) maxPrice = high;
                 if (low < minPrice) minPrice = low;
 
                 // Add candlestick data point using index for X-axis
                 candlestickSeries.Points.AddXY(index, high, low, open, close);
-                candlestickSeries.Points[index].AxisLabel = date.ToString("MMM dd"); // Set date as custom label
+                candlestickSeries.Points[index].AxisLabel = date.ToString("MMM dd");
 
-                // Add volume data point
+                // Add volume data point and color it based on price movement
                 DataPoint volumePoint = new DataPoint();
                 volumePoint.XValue = index;
                 volumePoint.YValues = new double[] { volume };
-                volumePoint.Color = Color.FromArgb(128, 0, 0, 255);  // Semi-transparent blue
-                volumeSeries.Points.Add(volumePoint);
 
-                index++;  // Increment index for consecutive plotting
+                // Set color based on whether the price went up or down
+                volumePoint.Color = close >= open ? Color.Green : Color.Red;
+
+                volumeSeries.Points.Add(volumePoint);
+                index++;
             }
 
-            // Calculate the adaptive Y-axis range
-            double yAxisMax = maxPrice * 1.1;  // 10% above the max price
-            double yAxisMin = minPrice * 0.9;  // 10% below the min price
+            double yAxisMax = maxPrice * 1.03;
+            double yAxisMin = minPrice * 0.97;
 
-            // Adjust axis labels and scaling
-            var chartArea = chart_stocks.ChartAreas[0];
-
-            // Set adaptive Y-axis range
+            var chartArea = chart_stocks.ChartAreas["ChartAreaCandlestick"];
             chartArea.AxisY.Minimum = yAxisMin;
             chartArea.AxisY.Maximum = yAxisMax;
-            chartArea.AxisY.LabelStyle.Format = "C2";  // Currency format with 2 decimal places
+            chartArea.AxisY.LabelStyle.Format = "C2";
 
-            // Format Y-axis for volume (right side)
-            chartArea.AxisY2.LabelStyle.Format = "N0";  // Number format with no decimal places
-            chartArea.AxisY2.Title = "Volume";
-            chartArea.AxisY2.TitleFont = new Font("Arial", 8, FontStyle.Regular);
+            var volumeChartArea = chart_stocks.ChartAreas["ChartAreaVolume"];
+            volumeChartArea.AxisY2.LabelStyle.Format = "N0";
+            volumeChartArea.AxisY2.Title = "Volume";
+            volumeChartArea.AxisY2.TitleFont = new Font("Arial", 8, FontStyle.Regular);
 
-            // Disable automatic date-based intervals on X-axis
             chartArea.AxisX.Interval = 1;
             chartArea.AxisX.LabelStyle.IsEndLabelVisible = true;
             chartArea.AxisX.ScaleView.Zoomable = false;
-            chartArea.AxisX.LabelStyle.Angle = -45; // Rotate labels if needed for better visibility
+            chartArea.AxisX.LabelStyle.Angle = -45;
 
-            // Make sure all data points are visible
             chartArea.RecalculateAxesScale();
         }
+
 
     }
 }
