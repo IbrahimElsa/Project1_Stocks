@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -19,18 +21,45 @@ namespace Project1_Stocks
         private void SetupChart()
         {
             chart_stocks.Series.Clear();
+            chart_stocks.ChartAreas.Clear();
+
+            // Configure chart area
+            var chartArea = new ChartArea("ChartArea1");
+            chartArea.AxisX.MajorGrid.Enabled = false;
+            chartArea.AxisY.MajorGrid.Enabled = true;
+            chartArea.AxisX.LabelStyle.Format = "MMM dd";
+
+            // Set background colors for better visibility
+            chartArea.BackColor = Color.White;
+            chartArea.BorderColor = Color.LightGray;
+            chartArea.BorderWidth = 1;
+
+            // Configure grid lines for better readability
+            chartArea.AxisX.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
+            chartArea.AxisY.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
+
+            // Adjust Y-axis range for candlesticks
+            chartArea.AxisY.Minimum = 180;  // Set minimum value based on data
+            chartArea.AxisY.Maximum = 250;  // Set maximum value based on data
+
+            chart_stocks.ChartAreas.Add(chartArea);
 
             // Configure candlestick series
             var candlestickSeries = new Series("Candlestick");
             candlestickSeries.ChartType = SeriesChartType.Candlestick;
             candlestickSeries.XValueType = ChartValueType.DateTime;
-
-            // Set how the candlesticks should be displayed
             candlestickSeries.YValuesPerPoint = 4;  // High, Low, Open, Close
-            candlestickSeries["OpenCloseStyle"] = "Triangle";
-            candlestickSeries["ShowOpenClose"] = "Both";
-            candlestickSeries["UpColor"] = "Green";   // Green for bullish (price went up)
-            candlestickSeries["DownColor"] = "Red";   // Red for bearish (price went down)
+
+            // Enhanced candlestick appearance
+            candlestickSeries["PriceUpColor"] = "LimeGreen";   // Body color when price is up
+            candlestickSeries["PriceDownColor"] = "Red";       // Body color when price is down
+            candlestickSeries["PointWidth"] = "1.0";           // Increased width to remove gaps
+            candlestickSeries["OpenCloseStyle"] = "Triangle";  // Candlestick style
+            candlestickSeries["ShowOpenClose"] = "Both";       // Show both open and close
+
+            // Disable any automatic spacing between points
+            candlestickSeries["EmptyPointValue"] = "Zero";
+            candlestickSeries["MaxPixelPointWidth"] = "15";    // Limit maximum width of candlesticks
 
             chart_stocks.Series.Add(candlestickSeries);
 
@@ -38,6 +67,13 @@ namespace Project1_Stocks
             var volumeSeries = new Series("Volume");
             volumeSeries.ChartType = SeriesChartType.Column;
             volumeSeries.XValueType = ChartValueType.DateTime;
+            volumeSeries.YAxisType = AxisType.Secondary;
+
+            // Set volume color to blue and adjust width to match candlesticks
+            volumeSeries.Color = Color.FromArgb(128, 0, 0, 255);  // Semi-transparent blue
+            volumeSeries["PointWidth"] = "0.8";                   // Match candlestick spacing
+            volumeSeries["EmptyPointValue"] = "Zero";             // Handle empty points consistently
+
             chart_stocks.Series.Add(volumeSeries);
         }
 
@@ -51,8 +87,22 @@ namespace Project1_Stocks
         {
             DataTable stockData = new DataTable();
 
+            // Extract ticker and time frame from file name
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string[] nameParts = fileName.Split('-');
+            if (nameParts.Length == 2)
+            {
+                string ticker = nameParts[0];
+                string timeFrame = nameParts[1];
+                label_stockName.Text = $"{ticker} - {timeFrame}";
+            }
+            else
+            {
+                label_stockName.Text = "Invalid file name format";
+            }
+
             // Read CSV into DataTable
-            using (var sr = new System.IO.StreamReader(filePath))
+            using (var sr = new StreamReader(filePath))
             {
                 string[] headers = sr.ReadLine().Split(',');
                 foreach (string header in headers)
@@ -93,6 +143,9 @@ namespace Project1_Stocks
             var candlestickSeries = chart_stocks.Series["Candlestick"];
             var volumeSeries = chart_stocks.Series["Volume"];
 
+            candlestickSeries.Points.Clear();
+            volumeSeries.Points.Clear();
+
             foreach (DataRow row in stockData.Rows)
             {
                 DateTime date = DateTime.Parse(row["Date"].ToString());
@@ -102,12 +155,31 @@ namespace Project1_Stocks
                 double close = Convert.ToDouble(row["Close"]);
                 double volume = Convert.ToDouble(row["Volume"]);
 
-                // Add candlestick data point (Open, High, Low, Close)
+                // Add candlestick data point
                 candlestickSeries.Points.AddXY(date, high, low, open, close);
 
-                // Add volume data point
-                volumeSeries.Points.AddXY(date, volume);
+                // Add volume data point with blue color
+                DataPoint volumePoint = new DataPoint();
+                volumePoint.XValue = date.ToOADate();
+                volumePoint.YValues = new double[] { volume };
+                volumePoint.Color = Color.FromArgb(128, 0, 0, 255);  // Semi-transparent blue
+
+                volumeSeries.Points.Add(volumePoint);
             }
+
+            // Adjust axis labels and scaling
+            var chartArea = chart_stocks.ChartAreas[0];
+
+            // Format Y-axis for price (left side)
+            chartArea.AxisY.LabelStyle.Format = "C2";  // Currency format with 2 decimal places
+
+            // Format Y-axis for volume (right side)
+            chartArea.AxisY2.LabelStyle.Format = "N0";  // Number format with no decimal places
+            chartArea.AxisY2.Title = "Volume";
+            chartArea.AxisY2.TitleFont = new Font("Arial", 8, FontStyle.Regular);
+
+            // Make sure all data points are visible
+            chartArea.RecalculateAxesScale();
         }
     }
 }
