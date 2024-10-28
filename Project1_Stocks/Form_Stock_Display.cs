@@ -147,6 +147,8 @@ namespace Project1_Stocks
             candlestickSeries.Points.Clear();
             volumeSeries.Points.Clear();
 
+            double maxPrice = double.MinValue;
+            double minPrice = double.MaxValue;
             int index = 0;  // Use an index to plot points consecutively
 
             foreach (DataRow row in stockData.Rows)
@@ -162,6 +164,10 @@ namespace Project1_Stocks
                 double low = Convert.ToDouble(row["Low"]);
                 double close = Convert.ToDouble(row["Close"]);
 
+                // Update max and min prices based on the data
+                if (high > maxPrice) maxPrice = high;
+                if (low < minPrice) minPrice = low;
+
                 // Add candlestick data point using index for X-axis
                 candlestickSeries.Points.AddXY(index, high, low, open, close);
                 candlestickSeries.Points[index].AxisLabel = date.ToString("MMM dd"); // Set date as custom label
@@ -176,10 +182,16 @@ namespace Project1_Stocks
                 index++;  // Increment index for consecutive plotting
             }
 
+            // Calculate the adaptive Y-axis range
+            double yAxisMax = maxPrice * 1.1;  // 10% above the max price
+            double yAxisMin = minPrice * 0.9;  // 10% below the min price
+
             // Adjust axis labels and scaling
             var chartArea = chart_stocks.ChartAreas[0];
 
-            // Format Y-axis for price (left side)
+            // Set adaptive Y-axis range
+            chartArea.AxisY.Minimum = yAxisMin;
+            chartArea.AxisY.Maximum = yAxisMax;
             chartArea.AxisY.LabelStyle.Format = "C2";  // Currency format with 2 decimal places
 
             // Format Y-axis for volume (right side)
