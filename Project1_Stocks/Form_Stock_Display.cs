@@ -135,7 +135,8 @@ namespace Project1_Stocks
         }
 
         /// <summary>
-        /// Populates the chart with stock data.
+        /// Populates the chart with stock data, filtering out non-trading days (zero volume),
+        /// and removing gaps by using an index-based X-axis.
         /// </summary>
         /// <param name="stockData">The stock data to be displayed.</param>
         private void PopulateChart(DataTable stockData)
@@ -146,25 +147,33 @@ namespace Project1_Stocks
             candlestickSeries.Points.Clear();
             volumeSeries.Points.Clear();
 
+            int index = 0;  // Use an index to plot points consecutively
+
             foreach (DataRow row in stockData.Rows)
             {
                 DateTime date = DateTime.Parse(row["Date"].ToString());
+                double volume = Convert.ToDouble(row["Volume"]);
+
+                // Skip non-trading days with zero volume
+                if (volume == 0) continue;
+
                 double open = Convert.ToDouble(row["Open"]);
                 double high = Convert.ToDouble(row["High"]);
                 double low = Convert.ToDouble(row["Low"]);
                 double close = Convert.ToDouble(row["Close"]);
-                double volume = Convert.ToDouble(row["Volume"]);
 
-                // Add candlestick data point
-                candlestickSeries.Points.AddXY(date, high, low, open, close);
+                // Add candlestick data point using index for X-axis
+                candlestickSeries.Points.AddXY(index, high, low, open, close);
+                candlestickSeries.Points[index].AxisLabel = date.ToString("MMM dd"); // Set date as custom label
 
-                // Add volume data point with blue color
+                // Add volume data point
                 DataPoint volumePoint = new DataPoint();
-                volumePoint.XValue = date.ToOADate();
+                volumePoint.XValue = index;
                 volumePoint.YValues = new double[] { volume };
                 volumePoint.Color = Color.FromArgb(128, 0, 0, 255);  // Semi-transparent blue
-
                 volumeSeries.Points.Add(volumePoint);
+
+                index++;  // Increment index for consecutive plotting
             }
 
             // Adjust axis labels and scaling
@@ -178,8 +187,15 @@ namespace Project1_Stocks
             chartArea.AxisY2.Title = "Volume";
             chartArea.AxisY2.TitleFont = new Font("Arial", 8, FontStyle.Regular);
 
+            // Disable automatic date-based intervals on X-axis
+            chartArea.AxisX.Interval = 1;
+            chartArea.AxisX.LabelStyle.IsEndLabelVisible = true;
+            chartArea.AxisX.ScaleView.Zoomable = false;
+            chartArea.AxisX.LabelStyle.Angle = -45; // Rotate labels if needed for better visibility
+
             // Make sure all data points are visible
             chartArea.RecalculateAxesScale();
         }
+
     }
 }
