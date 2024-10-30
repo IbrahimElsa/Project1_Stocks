@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.IO;
 using System.Windows.Forms;
 
@@ -26,13 +25,12 @@ namespace Project1_Stocks
                 DateTime startDate = dateTimePicker_startDate.Value;
                 DateTime endDate = dateTimePicker_endDate.Value;
 
-                // Create and set up the display form
-                Form_Stock_Display displayForm = new Form_Stock_Display();
+                // Create and set up the display form, passing the selected dates
+                Form_Stock_Display displayForm = new Form_Stock_Display(startDate, endDate);
                 displayForm.SetStartAndEndDates(startDate, endDate);
                 displayForm.LoadStockData(filePath, startDate, endDate);
                 displayForm.Show();
             }
         }
-
     }
 }

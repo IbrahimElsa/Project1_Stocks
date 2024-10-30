@@ -9,13 +9,26 @@ namespace Project1_Stocks
 {
     public partial class Form_Stock_Display : Form
     {
-        public Form_Stock_Display()
+        private string filePath;
+
+        public Form_Stock_Display(DateTime startDate, DateTime endDate)
         {
             InitializeComponent();
             SetupChart();
-
-            // Center the labels horizontally
             CenterLabels();
+
+            // Initialize date pickers with the passed-in dates
+            dateTimePicker_startDateUpdate.Value = startDate;
+            dateTimePicker_endDateUpdate.Value = endDate;
+
+            // Initialize button as disabled
+            button_updateDates.Enabled = false;
+
+            // Event handlers to enable the update button on date change
+            dateTimePicker_startDateUpdate.ValueChanged += DatePicker_ValueChanged;
+            dateTimePicker_endDateUpdate.ValueChanged += DatePicker_ValueChanged;
+
+            button_updateDates.Click += Button_updateDates_Click;
             this.Resize += (s, e) => CenterLabels(); // Re-center on form resize
         }
 
@@ -25,58 +38,61 @@ namespace Project1_Stocks
             label_startAndEndDates.Left = (this.ClientSize.Width - label_startAndEndDates.Width) / 2;
         }
 
+        private void DatePicker_ValueChanged(object sender, EventArgs e)
+        {
+            button_updateDates.Enabled = true;
+        }
+
+        private void Button_updateDates_Click(object sender, EventArgs e)
+        {
+            DateTime newStartDate = dateTimePicker_startDateUpdate.Value;
+            DateTime newEndDate = dateTimePicker_endDateUpdate.Value;
+
+            // Update the label with the new date range
+            SetStartAndEndDates(newStartDate, newEndDate);
+
+            // Reload stock data with the new dates
+            LoadStockData(filePath, newStartDate, newEndDate);
+
+            // Disable the button again after updating
+            button_updateDates.Enabled = false;
+        }
 
         public void SetStartAndEndDates(DateTime startDate, DateTime endDate)
         {
             label_startAndEndDates.Text = $"{startDate:MMM dd, yyyy} - {endDate:MMM dd, yyyy}";
         }
 
-
-        /// <summary>
-        /// Sets up chart properties for candlestick and volume display.
-        /// </summary>
         private void SetupChart()
         {
             chart_stocks.Series.Clear();
             chart_stocks.ChartAreas.Clear();
 
-            // Configure main chart area for candlesticks
             var chartAreaCandlestick = new ChartArea("ChartAreaCandlestick");
             chartAreaCandlestick.AxisX.MajorGrid.Enabled = false;
             chartAreaCandlestick.AxisY.MajorGrid.Enabled = true;
             chartAreaCandlestick.AxisX.LabelStyle.Format = "MMM dd";
-
             chartAreaCandlestick.BackColor = Color.White;
             chartAreaCandlestick.BorderColor = Color.LightGray;
             chartAreaCandlestick.BorderWidth = 1;
-
             chartAreaCandlestick.AxisX.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
             chartAreaCandlestick.AxisY.MajorGrid.LineColor = Color.FromArgb(64, 64, 64, 64);
-
-            chartAreaCandlestick.AxisY.Minimum = 180;  // Adjust based on data
-            chartAreaCandlestick.AxisY.Maximum = 250;  // Adjust based on data
-
-            chartAreaCandlestick.Position = new ElementPosition(0, 0, 100, 70); // 70% height for candlestick chart
+            chartAreaCandlestick.Position = new ElementPosition(0, 0, 100, 70);
             chart_stocks.ChartAreas.Add(chartAreaCandlestick);
 
-            // Configure second chart area for volume
             var chartAreaVolume = new ChartArea("ChartAreaVolume");
             chartAreaVolume.AxisX.MajorGrid.Enabled = false;
             chartAreaVolume.AxisY.MajorGrid.Enabled = false;
             chartAreaVolume.AxisX.LabelStyle.Enabled = false;
-
             chartAreaVolume.BackColor = Color.WhiteSmoke;
-            chartAreaVolume.Position = new ElementPosition(0, 70, 100, 30); // 30% height for volume chart
-            chartAreaVolume.AlignWithChartArea = "ChartAreaCandlestick"; // Aligns with main chart area for X-axis
-
+            chartAreaVolume.Position = new ElementPosition(0, 70, 100, 30);
+            chartAreaVolume.AlignWithChartArea = "ChartAreaCandlestick";
             chart_stocks.ChartAreas.Add(chartAreaVolume);
 
-            // Configure candlestick series
             var candlestickSeries = new Series("Candlestick");
             candlestickSeries.ChartType = SeriesChartType.Candlestick;
             candlestickSeries.XValueType = ChartValueType.DateTime;
             candlestickSeries.YValuesPerPoint = 4;
-
             candlestickSeries["PriceUpColor"] = "LimeGreen";
             candlestickSeries["PriceDownColor"] = "Red";
             candlestickSeries["PointWidth"] = "1.0";
@@ -84,35 +100,25 @@ namespace Project1_Stocks
             candlestickSeries["ShowOpenClose"] = "Both";
             candlestickSeries["EmptyPointValue"] = "Zero";
             candlestickSeries["MaxPixelPointWidth"] = "60";
-
             candlestickSeries.ChartArea = "ChartAreaCandlestick";
             chart_stocks.Series.Add(candlestickSeries);
 
-            // Configure volume series to use the new volume chart area
             var volumeSeries = new Series("Volume");
             volumeSeries.ChartType = SeriesChartType.Column;
             volumeSeries.XValueType = ChartValueType.DateTime;
             volumeSeries.YAxisType = AxisType.Primary;
-            volumeSeries.Color = Color.LimeGreen; // Semi-transparent blue
+            volumeSeries.Color = Color.LimeGreen;
             volumeSeries["PointWidth"] = "0.8";
             volumeSeries["EmptyPointValue"] = "Zero";
-
-            volumeSeries.ChartArea = "ChartAreaVolume"; // Assign to the volume chart area
+            volumeSeries.ChartArea = "ChartAreaVolume";
             chart_stocks.Series.Add(volumeSeries);
         }
 
-
-        /// <summary>
-        /// Loads stock data from a CSV file and displays it in the DataGridView and Chart.
-        /// </summary>
-        /// <param name="filePath">The path to the CSV file.</param>
-        /// <param name="startDate">The start date for filtering data.</param>
-        /// <param name="endDate">The end date for filtering data.</param>
         public void LoadStockData(string filePath, DateTime startDate, DateTime endDate)
         {
+            this.filePath = filePath; // Store file path for reuse
             DataTable stockData = new DataTable();
 
-            // Extract ticker and time frame from file name
             string fileName = Path.GetFileNameWithoutExtension(filePath);
             string[] nameParts = fileName.Split('-');
             if (nameParts.Length == 2)
@@ -126,7 +132,6 @@ namespace Project1_Stocks
                 label_stockNameAndTimeFrame.Text = "Invalid file name format";
             }
 
-            // Read CSV into DataTable
             using (var sr = new StreamReader(filePath))
             {
                 string[] headers = sr.ReadLine().Split(',');
@@ -143,7 +148,7 @@ namespace Project1_Stocks
                     {
                         dr[i] = rows[i];
                     }
-                    // Filter data by date range
+
                     DateTime rowDate = DateTime.Parse(dr["Date"].ToString());
                     if (rowDate >= startDate && rowDate <= endDate)
                     {
@@ -152,18 +157,10 @@ namespace Project1_Stocks
                 }
             }
 
-            // Bind DataTable to DataGridView
             dataGridView1.DataSource = stockData;
-
-            // Load data into Chart
             PopulateChart(stockData);
         }
 
-        /// <summary>
-        /// Populates the chart with stock data, filtering out non-trading days (zero volume),
-        /// and removing gaps by using an index-based X-axis.
-        /// </summary>
-        /// <param name="stockData">The stock data to be displayed.</param>
         private void PopulateChart(DataTable stockData)
         {
             var candlestickSeries = chart_stocks.Series["Candlestick"];
@@ -180,7 +177,6 @@ namespace Project1_Stocks
             {
                 DateTime date = DateTime.Parse(row["Date"].ToString());
                 double volume = Convert.ToDouble(row["Volume"]);
-
                 if (volume == 0) continue;
 
                 double open = Convert.ToDouble(row["Open"]);
@@ -191,17 +187,15 @@ namespace Project1_Stocks
                 if (high > maxPrice) maxPrice = high;
                 if (low < minPrice) minPrice = low;
 
-                // Add candlestick data point using index for X-axis
                 candlestickSeries.Points.AddXY(index, high, low, open, close);
                 candlestickSeries.Points[index].AxisLabel = date.ToString("MMM dd");
 
-                // Add volume data point and color it based on price movement
-                DataPoint volumePoint = new DataPoint();
-                volumePoint.XValue = index;
-                volumePoint.YValues = new double[] { volume };
-
-                // Set color based on whether the price went up or down
-                volumePoint.Color = close >= open ? Color.Green : Color.Red;
+                DataPoint volumePoint = new DataPoint
+                {
+                    XValue = index,
+                    YValues = new double[] { volume },
+                    Color = close >= open ? Color.Green : Color.Red
+                };
 
                 volumeSeries.Points.Add(volumePoint);
                 index++;
@@ -209,25 +203,15 @@ namespace Project1_Stocks
 
             double yAxisMax = maxPrice * 1.03;
             double yAxisMin = minPrice * 0.97;
-
             var chartArea = chart_stocks.ChartAreas["ChartAreaCandlestick"];
             chartArea.AxisY.Minimum = yAxisMin;
             chartArea.AxisY.Maximum = yAxisMax;
             chartArea.AxisY.LabelStyle.Format = "C2";
-
-            var volumeChartArea = chart_stocks.ChartAreas["ChartAreaVolume"];
-            volumeChartArea.AxisY2.LabelStyle.Format = "N0";
-            volumeChartArea.AxisY2.Title = "Volume";
-            volumeChartArea.AxisY2.TitleFont = new Font("Arial", 8, FontStyle.Regular);
-
             chartArea.AxisX.Interval = 1;
             chartArea.AxisX.LabelStyle.IsEndLabelVisible = true;
             chartArea.AxisX.ScaleView.Zoomable = false;
             chartArea.AxisX.LabelStyle.Angle = -45;
-
             chartArea.RecalculateAxesScale();
         }
-
-
     }
 }
