@@ -13,7 +13,24 @@ namespace Project1_Stocks
         {
             InitializeComponent();
             SetupChart();
+
+            // Center the labels horizontally
+            CenterLabels();
+            this.Resize += (s, e) => CenterLabels(); // Re-center on form resize
         }
+
+        private void CenterLabels()
+        {
+            label_stockNameAndTimeFrame.Left = (this.ClientSize.Width - label_stockNameAndTimeFrame.Width) / 2;
+            label_startAndEndDates.Left = (this.ClientSize.Width - label_startAndEndDates.Width) / 2;
+        }
+
+
+        public void SetStartAndEndDates(DateTime startDate, DateTime endDate)
+        {
+            label_startAndEndDates.Text = $"{startDate:MMM dd, yyyy} - {endDate:MMM dd, yyyy}";
+        }
+
 
         /// <summary>
         /// Sets up chart properties for candlestick and volume display.
@@ -102,11 +119,11 @@ namespace Project1_Stocks
             {
                 string ticker = nameParts[0];
                 string timeFrame = nameParts[1];
-                label_stockName.Text = $"{ticker} - {timeFrame}";
+                label_stockNameAndTimeFrame.Text = $"{ticker} - {timeFrame}";
             }
             else
             {
-                label_stockName.Text = "Invalid file name format";
+                label_stockNameAndTimeFrame.Text = "Invalid file name format";
             }
 
             // Read CSV into DataTable

@@ -39,36 +39,40 @@
             // dateTimePicker_endDate
             // 
             this.dateTimePicker_endDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dateTimePicker_endDate.Location = new System.Drawing.Point(515, 91);
+            this.dateTimePicker_endDate.Location = new System.Drawing.Point(387, 74);
+            this.dateTimePicker_endDate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dateTimePicker_endDate.Name = "dateTimePicker_endDate";
-            this.dateTimePicker_endDate.Size = new System.Drawing.Size(405, 34);
+            this.dateTimePicker_endDate.Size = new System.Drawing.Size(305, 28);
             this.dateTimePicker_endDate.TabIndex = 0;
             // 
             // dateTimePicker_startDate
             // 
             this.dateTimePicker_startDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dateTimePicker_startDate.Location = new System.Drawing.Point(12, 91);
+            this.dateTimePicker_startDate.Location = new System.Drawing.Point(9, 74);
+            this.dateTimePicker_startDate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.dateTimePicker_startDate.Name = "dateTimePicker_startDate";
-            this.dateTimePicker_startDate.Size = new System.Drawing.Size(386, 34);
+            this.dateTimePicker_startDate.Size = new System.Drawing.Size(290, 28);
             this.dateTimePicker_startDate.TabIndex = 1;
             // 
             // Label_startDate
             // 
             this.Label_startDate.AutoSize = true;
-            this.Label_startDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_startDate.Location = new System.Drawing.Point(146, 34);
+            this.Label_startDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Label_startDate.Location = new System.Drawing.Point(81, 28);
+            this.Label_startDate.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Label_startDate.Name = "Label_startDate";
-            this.Label_startDate.Size = new System.Drawing.Size(118, 29);
+            this.Label_startDate.Size = new System.Drawing.Size(137, 31);
             this.Label_startDate.TabIndex = 2;
             this.Label_startDate.Text = "Start Date";
             // 
             // Label_endDate
             // 
             this.Label_endDate.AutoSize = true;
-            this.Label_endDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_endDate.Location = new System.Drawing.Point(662, 34);
+            this.Label_endDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Label_endDate.Location = new System.Drawing.Point(485, 28);
+            this.Label_endDate.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Label_endDate.Name = "Label_endDate";
-            this.Label_endDate.Size = new System.Drawing.Size(112, 29);
+            this.Label_endDate.Size = new System.Drawing.Size(127, 31);
             this.Label_endDate.TabIndex = 3;
             this.Label_endDate.Text = "End Date";
             // 
@@ -76,9 +80,10 @@
             // 
             this.button_loadStock.AllowDrop = true;
             this.button_loadStock.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_loadStock.Location = new System.Drawing.Point(345, 219);
+            this.button_loadStock.Location = new System.Drawing.Point(249, 138);
+            this.button_loadStock.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button_loadStock.Name = "button_loadStock";
-            this.button_loadStock.Size = new System.Drawing.Size(220, 71);
+            this.button_loadStock.Size = new System.Drawing.Size(188, 72);
             this.button_loadStock.TabIndex = 4;
             this.button_loadStock.Text = "Load Stock";
             this.button_loadStock.UseVisualStyleBackColor = true;
@@ -89,14 +94,16 @@
             // 
             // Form_Input
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(937, 391);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(703, 245);
             this.Controls.Add(this.button_loadStock);
             this.Controls.Add(this.Label_endDate);
             this.Controls.Add(this.Label_startDate);
             this.Controls.Add(this.dateTimePicker_startDate);
             this.Controls.Add(this.dateTimePicker_endDate);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form_Input";
             this.Text = "Input Form";
             this.ResumeLayout(false);

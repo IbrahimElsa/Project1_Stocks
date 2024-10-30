@@ -20,18 +20,19 @@ namespace Project1_Stocks
 
         private void Button_loadStock_Click(object sender, EventArgs e)
         {
-            // Open file dialog to select CSV file
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string filePath = openFileDialog.FileName;
                 DateTime startDate = dateTimePicker_startDate.Value;
                 DateTime endDate = dateTimePicker_endDate.Value;
 
-                // Load data and open display form
+                // Create and set up the display form
                 Form_Stock_Display displayForm = new Form_Stock_Display();
+                displayForm.SetStartAndEndDates(startDate, endDate);
                 displayForm.LoadStockData(filePath, startDate, endDate);
                 displayForm.Show();
             }
         }
+
     }
 }
