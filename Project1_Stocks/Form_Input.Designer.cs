@@ -40,7 +40,7 @@
             // 
             this.dateTimePicker_endDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dateTimePicker_endDate.Location = new System.Drawing.Point(387, 74);
-            this.dateTimePicker_endDate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dateTimePicker_endDate.Margin = new System.Windows.Forms.Padding(2);
             this.dateTimePicker_endDate.Name = "dateTimePicker_endDate";
             this.dateTimePicker_endDate.Size = new System.Drawing.Size(305, 28);
             this.dateTimePicker_endDate.TabIndex = 0;
@@ -49,7 +49,7 @@
             // 
             this.dateTimePicker_startDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dateTimePicker_startDate.Location = new System.Drawing.Point(9, 74);
-            this.dateTimePicker_startDate.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dateTimePicker_startDate.Margin = new System.Windows.Forms.Padding(2);
             this.dateTimePicker_startDate.Name = "dateTimePicker_startDate";
             this.dateTimePicker_startDate.Size = new System.Drawing.Size(290, 28);
             this.dateTimePicker_startDate.TabIndex = 1;
@@ -81,7 +81,7 @@
             this.button_loadStock.AllowDrop = true;
             this.button_loadStock.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button_loadStock.Location = new System.Drawing.Point(249, 138);
-            this.button_loadStock.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button_loadStock.Margin = new System.Windows.Forms.Padding(2);
             this.button_loadStock.Name = "button_loadStock";
             this.button_loadStock.Size = new System.Drawing.Size(188, 72);
             this.button_loadStock.TabIndex = 4;
@@ -91,6 +91,7 @@
             // openFileDialog
             // 
             this.openFileDialog.FileName = "openFileDialog";
+            this.openFileDialog.Filter = "Day|*day.csv|Week|*week.csv|Month|*month.csv|.csv|*.csv|All files|*.*";
             // 
             // Form_Input
             // 
@@ -103,8 +104,9 @@
             this.Controls.Add(this.Label_startDate);
             this.Controls.Add(this.dateTimePicker_startDate);
             this.Controls.Add(this.dateTimePicker_endDate);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form_Input";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Input Form";
             this.ResumeLayout(false);
             this.PerformLayout();
