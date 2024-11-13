@@ -36,6 +36,12 @@ namespace Project1_Stocks
             this.Resize += (s, e) => CenterLabels();
         }
 
+        // Method to set stock name and timeframe for display
+        public void SetStockNameAndTimeFrame(string stockName, string timeFrame)
+        {
+            label_stockNameAndTimeFrame.Text = $"{stockName} - {timeFrame}";
+        }
+
         // Centers labels in the middle of the form
         private void CenterLabels()
         {
@@ -58,6 +64,8 @@ namespace Project1_Stocks
             // Update date range label and reload stock data with the new dates
             SetStartAndEndDates(newStartDate, newEndDate);
             LoadStockData(filePath, newStartDate, newEndDate);
+            NormalizeChart(chart_stocks.Series["Candlestick"]);
+            AnnotatePeaksAndValleys(chart_stocks.Series["Candlestick"]);
 
             // Disable the update button after updating
             button_updateDates.Enabled = false;
@@ -80,6 +88,7 @@ namespace Project1_Stocks
             chartAreaCandlestick.AxisX.MajorGrid.Enabled = false;
             chartAreaCandlestick.AxisY.MajorGrid.Enabled = true;
             chartAreaCandlestick.AxisX.LabelStyle.Format = "MMM dd";
+            chartAreaCandlestick.AxisY.LabelStyle.Format = "F2";  // Round Y-axis to nearest penny
             chartAreaCandlestick.BackColor = Color.White;
             chartAreaCandlestick.BorderColor = Color.LightGray;
             chartAreaCandlestick.BorderWidth = 1;
@@ -96,7 +105,7 @@ namespace Project1_Stocks
             chart_stocks.ChartAreas.Add(chartAreaVolume);
 
             // Set the height of the volume chart area to be shorter
-            chartAreaVolume.Position = new ElementPosition(0, 80, 100, 20); 
+            chartAreaVolume.Position = new ElementPosition(0, 80, 100, 20);
             chartAreaVolume.AxisX.LabelStyle.Enabled = false;
 
             // Define candlestick series properties for the chart
@@ -122,6 +131,75 @@ namespace Project1_Stocks
             chart_stocks.Series.Add(volumeSeries);
         }
 
+        // Normalizes the chart to fit within a certain Y-axis range
+        private void NormalizeChart(Series candlestickSeries)
+        {
+            double maxPrice = double.MinValue;
+            double minPrice = double.MaxValue;
+
+            foreach (var point in candlestickSeries.Points)
+            {
+                double high = point.YValues[0];
+                double low = point.YValues[1];
+                if (high > maxPrice) maxPrice = high;
+                if (low < minPrice) minPrice = low;
+            }
+
+            var yAxis = chart_stocks.ChartAreas["ChartAreaCandlestick"].AxisY;
+            yAxis.Minimum = Math.Round(minPrice * 0.98, 2); // Round to nearest penny
+            yAxis.Maximum = Math.Round(maxPrice * 1.02, 2);
+        }
+
+        // Annotates peaks and valleys on the chart
+        private void AnnotatePeaksAndValleys(Series candlestickSeries)
+        {
+            for (int i = 1; i < candlestickSeries.Points.Count - 1; i++)
+            {
+                var prev = candlestickSeries.Points[i - 1].YValues[1];
+                var curr = candlestickSeries.Points[i].YValues[1];
+                var next = candlestickSeries.Points[i + 1].YValues[1];
+
+                bool isPeak = curr > prev && curr > next;
+                bool isValley = curr < prev && curr < next;
+
+                if (isPeak)
+                {
+                    AddAnnotation(candlestickSeries.Points[i], Color.Green, "Peak");
+                }
+                else if (isValley)
+                {
+                    AddAnnotation(candlestickSeries.Points[i], Color.Red, "Valley");
+                }
+            }
+        }
+
+        // Adds an annotation to a point on the chart
+        private void AddAnnotation(DataPoint point, Color color, string label)
+        {
+            var annotation = new TextAnnotation
+            {
+                Text = label,
+                ForeColor = color,
+                X = point.XValue,
+                Y = point.YValues[0],
+                AnchorX = point.XValue,
+                AnchorY = point.YValues[0],
+                AnchorAlignment = ContentAlignment.TopCenter
+            };
+            chart_stocks.Annotations.Add(annotation);
+
+            var lineAnnotation = new HorizontalLineAnnotation
+            {
+                AxisX = chart_stocks.ChartAreas[0].AxisX,
+                AxisY = chart_stocks.ChartAreas[0].AxisY,
+                IsInfinitive = true,
+                ClipToChartArea = chart_stocks.ChartAreas[0].Name,
+                LineColor = color,
+                AnchorY = point.YValues[0]
+            };
+            chart_stocks.Annotations.Add(lineAnnotation);
+        }
+
         // Loads stock data from the selected file, filtering by the specified date range
         public void LoadStockData(string filePath, DateTime startDate, DateTime endDate)
         {
@@ -131,16 +209,10 @@ namespace Project1_Stocks
             // Extract stock ticker and timeframe from the file name
             string fileName = Path.GetFileNameWithoutExtension(filePath);
             string[] nameParts = fileName.Split('-');
-            if (nameParts.Length == 2)
-            {
-                string ticker = nameParts[0];
-                string timeFrame = nameParts[1];
-                label_stockNameAndTimeFrame.Text = $"{ticker} - {timeFrame}";
-            }
-            else
-            {
-                label_stockNameAndTimeFrame.Text = "Invalid file name format";
-            }
+            string ticker = nameParts[0];
+            string timeFrame = nameParts.Length > 1 ? nameParts[1] : "Unknown";
+
+            SetStockNameAndTimeFrame(ticker, timeFrame);
 
             // Read the CSV file and populate the DataTable, filtering by date
             using (var sr = new StreamReader(filePath))
@@ -168,8 +240,9 @@ namespace Project1_Stocks
                 }
             }
 
-            dataGridView_stocks.DataSource = stockData; // Display data in the grid view
             PopulateChart(stockData);            // Populate chart with filtered data
+            NormalizeChart(chart_stocks.Series["Candlestick"]);
+            AnnotatePeaksAndValleys(chart_stocks.Series["Candlestick"]);
         }
 
         // Populates the chart with stock data, including candlestick and volume series
@@ -181,10 +254,7 @@ namespace Project1_Stocks
             candlestickSeries.Points.Clear();
             volumeSeries.Points.Clear();
 
-            double maxPrice = double.MinValue;
-            double minPrice = double.MaxValue;
             int index = 0;
-
             foreach (DataRow row in stockData.Rows)
             {
                 DateTime date = DateTime.Parse(row["Date"].ToString());
@@ -196,35 +266,90 @@ namespace Project1_Stocks
                 double low = Convert.ToDouble(row["Low"]);
                 double close = Convert.ToDouble(row["Close"]);
 
-                // Track max and min prices for chart scaling
-                if (high > maxPrice) maxPrice = high;
-                if (low < minPrice) minPrice = low;
+                // Create a SmartCandlestick instance for this data point
+                SmartCandlestick candlestick = new SmartCandlestick(open, high, low, close);
 
-                // Add data points to candlestick series
-                candlestickSeries.Points.AddXY(index, high, low, open, close);
-                candlestickSeries.Points[index].AxisLabel = date.ToString("MMM dd");
+                // Identify the pattern and set it as the tooltip
+                string pattern = IdentifyCandlestickPattern(candlestick);
 
-                // Add volume points, color based on price movement
+                // Create data point for the candlestick
+                DataPoint candlestickPoint = new DataPoint(index, new double[] { high, low, open, close });
+                candlestickSeries.Points.Add(candlestickPoint);
+
+                // Set the tooltip text for this specific candlestick
+                toolTip_candlestick.SetToolTip(chart_stocks,
+                    $"Date: {date:MMM dd}\nPattern: {pattern}\nOpen: {open}\nHigh: {high}\nLow: {low}\nClose: {close}");
+
+                // Add volume data point
                 DataPoint volumePoint = new DataPoint
                 {
                     XValue = index,
                     YValues = new double[] { volume },
                     Color = close >= open ? Color.Green : Color.Red
                 };
-
                 volumeSeries.Points.Add(volumePoint);
+
                 index++;
             }
-
-            // Set Y-axis range for price data
-            var chartArea = chart_stocks.ChartAreas["ChartAreaCandlestick"];
-            chartArea.AxisY.Minimum = minPrice * 0.97;
-            chartArea.AxisY.Maximum = maxPrice * 1.03;
-            chartArea.AxisY.LabelStyle.Format = "C2";
-            chartArea.AxisX.Interval = 1;
-            chartArea.AxisX.LabelStyle.IsEndLabelVisible = true;
-            chartArea.AxisX.LabelStyle.Angle = -45;
-            chartArea.RecalculateAxesScale();
         }
+
+
+        // Helper method to identify candlestick pattern
+        private string IdentifyCandlestickPattern(SmartCandlestick candlestick)
+        {
+            if (candlestick.IsMarubozu) return "Marubozu";
+            if (candlestick.IsHammer) return "Hammer";
+            if (candlestick.IsDragonflyDoji) return "Dragonfly Doji";
+            if (candlestick.IsGravestoneDoji) return "Gravestone Doji";
+            if (candlestick.IsDoji) return "Doji";
+            if (candlestick.IsBullish) return "Bullish";
+            if (candlestick.IsBearish) return "Bearish";
+            return "Neutral";
+        }
+
+    }
+
+    // Base Candlestick Class
+    public class Candlestick
+    {
+        public double Open { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
+        public double Close { get; set; }
+
+        // Constructor to initialize candlestick data
+        public Candlestick(double open, double high, double low, double close)
+        {
+            Open = open;
+            High = high;
+            Low = low;
+            Close = close;
+        }
+    }
+
+    // SmartCandlestick Class with Pattern Detection
+    public class SmartCandlestick : Candlestick
+    {
+        // Constructor calls base constructor to initialize properties
+        public SmartCandlestick(double open, double high, double low, double close)
+            : base(open, high, low, close)
+        {
+        }
+
+        public double Range => High - Low;
+        public double BodyRange => Math.Abs(Open - Close);
+        public double TopPrice => Math.Max(Open, Close);
+        public double BottomPrice => Math.Min(Open, Close);
+        public double UpperTail => High - TopPrice;
+        public double LowerTail => BottomPrice - Low;
+
+        public bool IsBullish => Close > Open;
+        public bool IsBearish => Close < Open;
+        public bool IsNeutral => Close == Open;
+        public bool IsMarubozu => Open == Low && Close == High;
+        public bool IsHammer => LowerTail > BodyRange * 2 && UpperTail < BodyRange;
+        public bool IsDoji => BodyRange < (Range * 0.1);
+        public bool IsDragonflyDoji => IsDoji && Open == Low;
+        public bool IsGravestoneDoji => IsDoji && Open == High;
     }
 }
