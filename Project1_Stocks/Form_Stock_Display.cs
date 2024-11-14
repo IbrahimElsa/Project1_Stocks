@@ -34,6 +34,9 @@ namespace Project1_Stocks
 
             // Re-center labels when the form is resized
             this.Resize += (s, e) => CenterLabels();
+
+            // Attach MouseMove event handler to dynamically update tooltips on hover
+            chart_stocks.MouseMove += Chart_stocks_MouseMove;
         }
 
         // Method to set stock name and timeframe for display
@@ -276,10 +279,6 @@ namespace Project1_Stocks
                 DataPoint candlestickPoint = new DataPoint(index, new double[] { high, low, open, close });
                 candlestickSeries.Points.Add(candlestickPoint);
 
-                // Set the tooltip text for this specific candlestick
-                toolTip_candlestick.SetToolTip(chart_stocks,
-                    $"Date: {date:MMM dd}\nPattern: {pattern}\nOpen: {open}\nHigh: {high}\nLow: {low}\nClose: {close}");
-
                 // Add volume data point
                 DataPoint volumePoint = new DataPoint
                 {
@@ -293,6 +292,35 @@ namespace Project1_Stocks
             }
         }
 
+        // Method to update tooltip on hover over candlesticks
+        private void Chart_stocks_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Check if the mouse is over a data point in the candlestick series
+            var hit = chart_stocks.HitTest(e.X, e.Y);
+            if (hit.Series != null && hit.Series.Name == "Candlestick" && hit.PointIndex >= 0)
+            {
+                // Retrieve the data point the mouse is hovering over
+                var point = hit.Series.Points[hit.PointIndex];
+                DateTime date = DateTime.FromOADate(point.XValue);
+                double open = point.YValues[2];
+                double high = point.YValues[0];
+                double low = point.YValues[1];
+                double close = point.YValues[3];
+
+                // Identify the pattern for the current candlestick
+                SmartCandlestick candlestick = new SmartCandlestick(open, high, low, close);
+                string pattern = IdentifyCandlestickPattern(candlestick);
+
+                // Update tooltip text
+                toolTip_candlestick.SetToolTip(chart_stocks,
+                    $"Date: {date:MMM dd}\nPattern: {pattern}\nOpen: {open}\nHigh: {high}\nLow: {low}\nClose: {close}");
+            }
+            else
+            {
+                // Clear the tooltip when not hovering over a candlestick
+                toolTip_candlestick.SetToolTip(chart_stocks, string.Empty);
+            }
+        }
 
         // Helper method to identify candlestick pattern
         private string IdentifyCandlestickPattern(SmartCandlestick candlestick)
@@ -306,7 +334,6 @@ namespace Project1_Stocks
             if (candlestick.IsBearish) return "Bearish";
             return "Neutral";
         }
-
     }
 
     // Base Candlestick Class
