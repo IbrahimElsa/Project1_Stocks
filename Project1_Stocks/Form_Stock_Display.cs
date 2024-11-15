@@ -179,17 +179,6 @@ namespace Project1_Stocks
         // Adds an annotation to a point on the chart
         private void AddAnnotation(DataPoint point, Color color, string label)
         {
-            var annotation = new TextAnnotation
-            {
-                Text = label,
-                ForeColor = color,
-                X = point.XValue,
-                Y = point.YValues[0],
-                AnchorX = point.XValue,
-                AnchorY = point.YValues[0],
-                AnchorAlignment = ContentAlignment.TopCenter
-            };
-            chart_stocks.Annotations.Add(annotation);
 
             var lineAnnotation = new HorizontalLineAnnotation
             {
@@ -198,7 +187,7 @@ namespace Project1_Stocks
                 IsInfinitive = true,
                 ClipToChartArea = chart_stocks.ChartAreas[0].Name,
                 LineColor = color,
-                AnchorY = point.YValues[0]
+                AnchorY = point.YValues[0],
             };
             chart_stocks.Annotations.Add(lineAnnotation);
         }
@@ -302,10 +291,10 @@ namespace Project1_Stocks
                 // Retrieve the data point the mouse is hovering over
                 var point = hit.Series.Points[hit.PointIndex];
                 DateTime date = DateTime.FromOADate(point.XValue);
-                double open = point.YValues[2];
-                double high = point.YValues[0];
-                double low = point.YValues[1];
-                double close = point.YValues[3];
+                double open = Math.Round(point.YValues[2], 2);
+                double high = Math.Round(point.YValues[0], 2);
+                double low = Math.Round(point.YValues[1], 2);
+                double close = Math.Round(point.YValues[3], 2);
 
                 // Identify the pattern for the current candlestick
                 SmartCandlestick candlestick = new SmartCandlestick(open, high, low, close);

@@ -16,7 +16,7 @@ namespace Project1_Stocks
             InitializeComponent();
 
             // Set the default date range for the start and end date pickers
-            dateTimePicker_startDate.Value = DateTime.Today.AddMonths(-1);
+            dateTimePicker_startDate.Value = new DateTime(2022, 1, 1);
             dateTimePicker_endDate.Value = DateTime.Today;
 
             // Configure OpenFileDialog to allow multiple file selections
