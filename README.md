@@ -1,4 +1,4 @@
-Stock Market Candlestick Visualizer
+**<h1>Stock Market Candlestick Visualizer<h1>**
 A Windows Forms application for visualizing stock market data using candlestick charts with pattern recognition and technical analysis features.
 Overview
 This C# .NET Framework application provides an intuitive interface for loading and analyzing stock market data from CSV files. It displays interactive candlestick charts with volume indicators, identifies common candlestick patterns, and marks significant peaks and valleys in price movements.
