@@ -11,17 +11,6 @@ Volume Analysis: Separate volume chart synchronized with price movements
 Date Range Filtering: Select specific date ranges for analysis
 Dynamic Date Updates: Modify date ranges on-the-fly without reloading files
 
-<h3>Technical Analysis</h3>
-
-Pattern Recognition: Automatically identifies candlestick patterns including:
-
-Bullish/Bearish candles
-Doji (neutral)
-Hammer
-Marubozu
-Dragonfly Doji
-Gravestone Doji
-
 
 Peak & Valley Detection: Automatically marks local highs and lows with colored horizontal lines
 Interactive Tooltips: Hover over any candlestick to see:
